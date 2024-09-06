@@ -1,0 +1,45 @@
+# Table of contents
+
+* [App](https://workpads.app)
+* [Why Workpads?](README.md)
+* [Records for Business](records-for-business.md)
+* [Future of Workpads](future-of-workpads.md)
+* [Pillars of Protocol](pillars-of-protocol.md)
+* [Overview](overview.md)
+
+## Architecture
+
+* [Header](architecture/header/README.md)
+  * [Pad Information](architecture/header/pad-information/README.md)
+    * [Pad Creation](architecture/header/pad-information/pad-creation.md)
+    * [Pad Title](architecture/header/pad-information/pad-title.md)
+    * [Pad Dates](architecture/header/pad-information/pad-dates.md)
+    * [Pad Subject](architecture/header/pad-information/pad-subject.md)
+    * [Pad Banner](architecture/header/pad-information/pad-banner.md)
+  * [Work Information](architecture/header/work-information/README.md)
+    * [Work Sponsor](architecture/header/work-information/work-sponsor.md)
+    * [Work Outcomes](architecture/header/work-information/work-outcomes.md)
+  * [Creator Information](architecture/header/creator-information.md)
+  * [Contact Information](architecture/header/contact-information.md)
+  * [Participant Information](architecture/header/participant-information.md)
+* [Blocks](architecture/blocks/README.md)
+  * [Types of Blocks](architecture/blocks/types-of-blocks.md)
+  * [Titles](architecture/blocks/titles.md)
+  * [Content](architecture/blocks/content.md)
+  * [Media](architecture/blocks/media.md)
+  * [Time](architecture/blocks/time.md)
+* [Modules](architecture/modules.md)
+* [Action Items](architecture/action-items/README.md)
+  * [Types of Actions](architecture/action-items/types-of-actions.md)
+* [Checklists](architecture/checklists.md)
+* [Footer](architecture/footer.md)
+
+## PROTOCOL
+
+* [Overview](protocol/overview.md)
+* [Create](protocol/create.md)
+* [Edit](protocol/edit.md)
+* [Share](protocol/share.md)
+* [Manage](protocol/manage.md)
+* [Template](protocol/template.md)
+* [Link](protocol/link.md)
