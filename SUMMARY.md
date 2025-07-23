@@ -2,11 +2,13 @@
 
 * [App](https://workpads.app)
 * [Why Workpads?](README.md)
-* [What is a Workpad?](what-is-a-workpad.md)
-* [Records for Business](records-for-business.md)
-* [Future of Workpads](future-of-workpads.md)
-* [Pillars of Protocol](pillars-of-protocol.md)
-* [Overview](overview.md)
+* [Project Information](project-information.md)
+* [Guiding Principles](guiding-principles/README.md)
+  * [Record Sovereignty](guiding-principles/record-sovereignty.md)
+  * [Record Security](guiding-principles/record-security.md)
+  * [Record Life](guiding-principles/record-life.md)
+* [Workpad Design](workpad-design.md)
+* [Protocol](pillars-of-protocol.md)
 
 ## Binary Architecture
 
@@ -147,7 +149,7 @@
 
 ## Workpad Design
 
-* [Workpad Design](workpad-design/workpad-design.md)
+* [Workpad Design](workpad-design-1/workpad-design.md)
 
 ## PROTOCOL
 
