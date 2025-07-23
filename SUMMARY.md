@@ -153,6 +153,14 @@
 
 * [Workpad Design](visual-language-system/workpad-design.md)
 
+## Agentic Interaction
+
+* [Page 1](agentic-interaction/page-1.md)
+
+## Forms of Transmission
+
+* [UART](forms-of-transmission/uart.md)
+
 ## PROTOCOL
 
 * [Overview](protocol/overview.md)
@@ -162,11 +170,3 @@
 * [Manage](protocol/manage.md)
 * [Template](protocol/template.md)
 * [Link](protocol/link.md)
-
-## Forms of Transmission
-
-* [UART](forms-of-transmission/uart.md)
-
-## Agentic Interaction
-
-* [Page 1](agentic-interaction/page-1.md)
