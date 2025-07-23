@@ -162,12 +162,12 @@
 
 * [UART](forms-of-transmission/uart.md)
 
-## PROTOCOL
+## WORKPADS PROTOCOL
 
-* [Overview](protocol/overview.md)
-* [Create](protocol/create.md)
-* [Edit](protocol/edit.md)
-* [Share](protocol/share.md)
-* [Manage](protocol/manage.md)
-* [Template](protocol/template.md)
-* [Link](protocol/link.md)
+* [Overview](workpads-protocol/overview.md)
+* [Create](workpads-protocol/create.md)
+* [Edit](workpads-protocol/edit.md)
+* [Share](workpads-protocol/share.md)
+* [Manage](workpads-protocol/manage.md)
+* [Template](workpads-protocol/template.md)
+* [Link](workpads-protocol/link.md)
