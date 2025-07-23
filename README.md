@@ -16,14 +16,19 @@ The goal of the project is to keep things simple, despite the complex  math and 
 
 The standard's design is based on assumptions of low-compute and low-energy conditions, in order to serve the broadest possible markets and populations.
 
+With the advances of AI, the standard provides for agentic interaction.
+
 Workpads is envisioned as a century system that's capable of serving people and communities in the remotest regions of Earth and beyond.
 
-This site is organized into 4 parts. To participate, connect on GitHub.
+Documentation is organized into 5 parts.
 
 1. Machine Architecture
 2. Mobile Architecture
-3. Visual Language
-4. Workpads Protocol
+3. Agentic Interaction
+4. Visual Language
+5. Workpads Protocol
+
+[View on GitHub](https://github.com/babbworks/workpadsproject)
 
 
 
