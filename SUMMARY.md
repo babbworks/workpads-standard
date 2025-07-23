@@ -10,9 +10,10 @@
 * [Workpad Design](workpad-design.md)
 * [Protocol](pillars-of-protocol.md)
 
-## Binary Architecture
+## Machine Architecture
 
-* [Workpad Sequence](binary-architecture/workpad-sequence.md)
+* [Workpad Sequence](machine-architecture/workpad-sequence.md)
+* [Machine Storage](machine-architecture/machine-storage.md)
 
 ## Mobile Architecture
 
@@ -146,10 +147,11 @@
 * [Modules](mobile-architecture/modules.md)
 * [Checklists](mobile-architecture/checklists.md)
 * [Footer](mobile-architecture/footer.md)
+* [Mobile Storage](mobile-architecture/mobile-storage.md)
 
-## Workpad Design
+## Visual Language System
 
-* [Workpad Design](workpad-design-1/workpad-design.md)
+* [Workpad Design](visual-language-system/workpad-design.md)
 
 ## PROTOCOL
 
@@ -160,3 +162,11 @@
 * [Manage](protocol/manage.md)
 * [Template](protocol/template.md)
 * [Link](protocol/link.md)
+
+## Forms of Transmission
+
+* [UART](forms-of-transmission/uart.md)
+
+## Agentic Interaction
+
+* [Page 1](agentic-interaction/page-1.md)

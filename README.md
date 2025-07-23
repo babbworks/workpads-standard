@@ -8,7 +8,7 @@ The [Workpads Project](https://www.workpads.org/) is an open effort to develop, 
 
 The individual record is treated as the building block for more complex information systems such as projects, businesses, and partnerships.
 
-In addition to codifying how records should be produced and shared, the standard outlines visual language for evolving any workpads application.
+In addition to codifying how records should be produced and shared, the standard outlines a visual language for evolving workpads applications.
 
 The project aims to facilitate adoption of Workpads in commercial and industrial settings, and as such binary and assembly languages, along with all forms of analog and terrestrial communication are its basis of development.
 
@@ -20,13 +20,14 @@ With the advances of AI, the standard provides for agentic interaction.
 
 Workpads is envisioned as a century system that's capable of serving people and communities in the remotest regions of Earth and beyond.
 
-Documentation is organized into 5 parts.
+Documentation is organized into 6 parts.
 
 1. Machine Architecture
 2. Mobile Architecture
 3. Agentic Interaction
-4. Visual Language
-5. Workpads Protocol
+4. Forms of Transmission
+5. Visual Language System
+6. Workpads Protocol
 
 [View on GitHub](https://github.com/babbworks/workpadsproject)
 
