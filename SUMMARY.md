@@ -151,11 +151,12 @@
 
 ## Visual Language System
 
-* [Workpad Design](visual-language-system/workpad-design.md)
+* [Workpad Layout](visual-language-system/workpad-layout.md)
+* [Navigation Icons](visual-language-system/navigation-icons.md)
 
 ## Agentic Interaction
 
-* [Page 1](agentic-interaction/page-1.md)
+* [Model Context Protocol](agentic-interaction/model-context-protocol.md)
 
 ## Forms of Transmission
 
