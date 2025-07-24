@@ -37,6 +37,11 @@
   * [Contact Information](mobile-architecture/header/contact-information.md)
   * [Participant Information](mobile-architecture/header/participant-information.md)
 * [Blocks](mobile-architecture/blocks/README.md)
+  * [Block Elements](mobile-architecture/blocks/blocks/README.md)
+    * [Titles](mobile-architecture/blocks/blocks/titles.md)
+    * [Content](mobile-architecture/blocks/blocks/content.md)
+    * [Media](mobile-architecture/blocks/blocks/media.md)
+    * [Time](mobile-architecture/blocks/blocks/time.md)
   * [System Blocks](mobile-architecture/blocks/system-blocks/README.md)
     * [Business Blocks](mobile-architecture/blocks/system-blocks/business-blocks/README.md)
       * [Vision](mobile-architecture/blocks/system-blocks/business-blocks/vision.md)
@@ -143,7 +148,8 @@
         * [Making](mobile-architecture/blocks/system-blocks/personal-blocks/activities/making.md)
         * [Creating](mobile-architecture/blocks/system-blocks/personal-blocks/activities/creating.md)
   * [Native Blocks](mobile-architecture/blocks/types-of-blocks/README.md)
-    * [Tasks](mobile-architecture/blocks/types-of-blocks/tasks.md)
+    * [Tasks](mobile-architecture/blocks/types-of-blocks/tasks/README.md)
+      * [Checklists](mobile-architecture/blocks/types-of-blocks/tasks/checklists.md)
     * [Notes](mobile-architecture/blocks/types-of-blocks/notes.md)
     * [Times](mobile-architecture/blocks/types-of-blocks/times.md)
     * [Count](mobile-architecture/blocks/types-of-blocks/count.md)
@@ -154,12 +160,6 @@
     * [Connections](mobile-architecture/blocks/foreign-blocks/connections.md)
     * [Visual Identity](mobile-architecture/blocks/foreign-blocks/visual-identity.md)
     * [Lifespan](mobile-architecture/blocks/foreign-blocks/lifespan.md)
-  * [Titles](mobile-architecture/blocks/titles.md)
-  * [Content](mobile-architecture/blocks/content.md)
-  * [Media](mobile-architecture/blocks/media.md)
-  * [Time](mobile-architecture/blocks/time.md)
-* [Modules](mobile-architecture/modules.md)
-* [Checklists](mobile-architecture/checklists.md)
 * [Footer](mobile-architecture/footer.md)
 * [Mobile Storage](mobile-architecture/mobile-storage.md)
 
@@ -185,3 +185,7 @@
 * [Manage](workpads-protocol/manage.md)
 * [Template](workpads-protocol/template.md)
 * [Link](workpads-protocol/link.md)
+
+## Personal Platform
+
+* [Platform Design](personal-platform/platform-design.md)
