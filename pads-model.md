@@ -122,4 +122,4 @@ The four-section split reflects the natural temporal phases of a service call:
 
 This temporal structure supports progressive disclosure UIs: a 4-step wizard walks the user through the sections in order. Each section can be submitted independently — the record is auto-saved between steps.
 
-The flat object structure (rather than nested sub-objects per section) is a deliberate encoding efficiency choice. Compact binary encoding (bitpad-v1) assigns fixed bit positions to fields, which requires a known, stable, flat field order.
+The flat object structure (rather than nested sub-objects per section) is a deliberate encoding efficiency choice. Compact binary encoding (pads-v1) assigns fixed bit positions to fields, which requires a known, stable, flat field order.

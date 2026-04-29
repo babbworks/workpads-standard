@@ -50,13 +50,13 @@ The workpads command surface is documented in `command-surface.md`. GUI actions 
 `command-surface.md` is versioned (v0.1) and will increment on breaking changes to the command vocabulary.
 
 **BASICS-SC-012 — Integration endpoint declared**
-The workpad URL schema (`https://workpads.me/p#alg=bitpad-v1&v=1&d=<payload>`) is declared as the integration endpoint in `command-surface.md`. Any tool that can handle a URL can participate in a workpad exchange. This satisfies SC-052 (integration endpoint must be formally declared).
+The workpad URL schema (`https://workpads.me/p#1ag/<payload>`) is declared as the integration endpoint in `command-surface.md`. Any tool that can handle a URL can participate in a workpad exchange. This satisfies SC-052 (integration endpoint must be formally declared).
 
 **BASICS-SC-040 — Degraded mode defined**
 `degraded-mode-matrix.md` documents workpads behaviour when storage is near-full, when an incoming URL is malformed, when encoding fails, and when the device is offline. Degraded mode is offline-always for v0.1 — the app is designed for offline-first operation, not as a degraded state.
 
 **BASICS-SC-041 — Local create/edit confirmed offline**
-Records can be created, edited, saved, and shared entirely without a network connection. The bitpad-v1 codec operates in-memory. localStorage is the only storage backend and requires no network. Confirmed by dirty-test baseline run (2026-04-20).
+Records can be created, edited, saved, and shared entirely without a network connection. The pads-v1 codec operates in-memory. localStorage is the only storage backend and requires no network. Confirmed by dirty-test baseline run (2026-04-20).
 
 **BASICS-SC-050 — Event schema defined**
 `event-schema.md` documents the events emitted by the workpads application layer: record:created, record:updated, record:archived, record:received, note:captured, profile:updated. Events are not yet emitted on a bus (v0.1 uses direct function calls) but the schema defines the interface for future wiring.
@@ -158,16 +158,16 @@ SC-055 explicitly enables this pattern: naming deviations are permitted when the
 
 Two compatibility signals are embedded in the wire format (not as separate artifacts):
 
-**Signal 1 — URL schema version (`v=`):**
+**Signal 1 — Scheme tag:**
 ```
-alg=bitpad-v1&v=1&d=<payload>
+1ag/<payload>
 ```
-`v=1` identifies the URL schema version. When a v0.2 decoder encounters a `v=1` URL, it knows exactly which field order, flag bit assignments, and compression parameters to use.
+The 3-character scheme tag (`1ag`) encodes codec version (`1`), codebook (`a`), and compression (`g`). When a future decoder encounters an unknown scheme tag, it knows exactly which codec generation applies — or can reject cleanly if the generation is unsupported.
 
-**Signal 2 — Field signature (bitpad-v1 frame byte 0):**
+**Signal 2 — Template byte (pads-v1 frame byte 0):**
 The first byte of the decompressed binary frame is the template identifier (`0x01` = svc-basic). Future decoders can detect an unknown template byte and reject gracefully rather than partially decoding.
 
-These two signals together provide forward compatibility: a v0.2 client can read v0.1 records because the template byte and version parameter fully specify the encoding.
+These two signals together provide forward compatibility: any conformant decoder can identify the encoding generation from the scheme tag and the record type from the template byte, without any out-of-band negotiation.
 
 ---
 

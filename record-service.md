@@ -110,11 +110,11 @@ Returns all archived records.
 
 ### `RecordService.encodeUrl(record) -> string`
 
-Encodes a record to a URL hash fragment string using the configured codec (bitpad-v1). Returns the fragment without the leading `#` and without the `https://workpads.me/p` prefix.
+Encodes a record to a URL hash fragment string using the pads-v1 codec. Returns the fragment without the leading `#` and without the `https://workpads.me/p` prefix.
 
 ```js
 var fragment = RecordService.encodeUrl(record);
-// -> 'alg=bitpad-v1&v=1&d=<base64url>'
+// -> '1ag/<base64url>'
 var fullUrl = 'https://workpads.me/p#' + fragment;
 ```
 

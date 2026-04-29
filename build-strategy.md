@@ -82,7 +82,7 @@ All business logic lives in `src/core/` and is shared between builds:
 - `ActivityService` — identity
 - `BlockRegistry` — contacts
 - `PersonalService` — quick notes
-- `WPCodec` — bitpad-v1 encoder/decoder
+- `WPCodec` — pads-v1 encoder/decoder
 
 ### Platform Adapters
 

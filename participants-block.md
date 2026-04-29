@@ -8,7 +8,7 @@
 
 ## 1. Purpose
 
-The participants block is pads-v1's mechanism for encoding the human parties to a workpad record. It replaces the simple `worker` text field (bitpad-v1 bit 8) with a typed, extensible structure that handles:
+The participants block is pads-v1's mechanism for encoding the human parties to a workpad record. It replaces the simple `worker` text field (pads-v1 bit 8) with a typed, extensible structure that handles:
 
 - Sole trader attribution (just me)
 - Employed worker + supervisor (two parties)
@@ -165,7 +165,7 @@ participants:
 
 ## 5. Relationship to Field Flags bit 8 (worker text)
 
-bitpad-v1 uses field flags bit 8 for a `worker` scalar text field. pads-v1 preserves this for backward compatibility. The interaction rules:
+The legacy format uses field flags bit 8 for a `worker` scalar text field. pads-v1 preserves this for backward compatibility. The interaction rules:
 
 | Scenario | Use bit 8 | Use participants block |
 |----------|-----------|----------------------|

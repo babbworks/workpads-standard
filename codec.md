@@ -1,8 +1,9 @@
 # §5 — Codec & Compact Encoding
 
-**Status:** v1 (settled 2026-04-27)
-**Algorithm:** bitpad-v1
-**Compression:** fflate deflateRaw (raw DEFLATE, RFC 1951)
+**Status:** v1.1 (settled 2026-04-27, financial fields added 2026-04-28)
+**Bitpads Registry ID:** `iHX7-3F9KQ2`
+**Algorithm:** pads-v1
+**Compression:** fflate deflateSync (DEFLATE, RFC 1951)
 **URL encoding:** base64url (no padding)
 
 ---
@@ -11,25 +12,35 @@
 
 The codec converts a workpad record to a compact string suitable for use as a URL hash fragment. This allows a record to be shared as a single URL — via SMS, QR code, clipboard, or any link transport — and decoded by any Workpads client without server involvement.
 
-The encoded string is placed after the `#` character in the URL, making it a hash fragment. Hash fragments are not sent to servers by browsers, which ensures the record data remains client-side during transmission.
+The encoded string is placed after the `#` character in the URL, making it a hash fragment. Hash fragments are not sent to servers by browsers, ensuring the record data remains client-side during transmission.
 
 ---
 
 ## URL Structure
 
 ```
-https://workpads.me/p#alg=bitpad-v1&v=1&d=<base64url>
+https://workpads.me/p#1ag/<base64url>
 ```
 
 | Component | Value | Description |
 |-----------|-------|-------------|
 | Origin | `https://workpads.me` | Canonical base URL for Workpads share links |
 | Path | `/p` | Workpad receiver path |
-| `alg` | `bitpad-v1` | Algorithm identifier — used by receiver to detect and route |
-| `v` | `1` | Version of the algorithm parameter encoding |
-| `d` | `<base64url>` | The encoded, compressed record data |
+| Scheme tag | `1ag` | 3-character encoding descriptor (see below) |
+| `/` | literal | Separator between scheme tag and payload |
+| `<base64url>` | variable | The compressed, base64url-encoded binary frame |
 
-The `alg=bitpad-v1` substring in the hash is the detection signal. When any Workpads client loads with a hash containing this string, it attempts to decode the workpad.
+### Scheme Tag
+
+The scheme tag is always 3 ASCII characters:
+
+| Position | Character | Meaning |
+|----------|-----------|---------|
+| 0 | `1` | pads format version 1 |
+| 1 | `a` | codebook A (svc-basic field set) |
+| 2 | `g` | compression: DEFLATE via fflate |
+
+Detection: a hash fragment matching `/^[0-9][a-z][a-z]\//` is a pads-v1 URL. Extract the payload as `hash.slice(4)`.
 
 ---
 
@@ -39,21 +50,15 @@ Given a valid record object:
 
 ### Step 1 — Assemble the binary frame
 
-Construct a byte array following the bitpad-v1 frame format (see below).
+Construct a byte array following the pads-v1 frame format (see below).
 
 ### Step 2 — Compress
 
-Apply raw DEFLATE compression (no zlib header, no gzip header) using the fflate library:
+Apply DEFLATE compression using `fflate.deflateSync`:
 
 ```js
-// Browser (fflate UMD)
-fflate.deflateRawSync(frameBytes)
-
-// Node.js (@workpads/codec)
-fflate.deflateRawSync(frameBytes)
+var compressed = fflate.deflateSync(frameBytes, { level: 9 });
 ```
-
-Raw DEFLATE produces the most compact output by omitting the 2-byte zlib header and 4-byte checksum present in zlib-wrapped deflate.
 
 ### Step 3 — base64url encode
 
@@ -66,12 +71,12 @@ base64url = base64(bytes)
               .replace(/=+$/, '')
 ```
 
-Standard base64 uses `+`, `/`, and `=` which are not URL-safe. base64url replaces them with `-`, `_`, and no padding, producing a string safe for use in URLs without percent-encoding.
+Standard base64 uses `+`, `/`, and `=` which are not URL-safe. base64url replaces them with `-`, `_`, and no padding.
 
 ### Step 4 — Produce hash fragment
 
-```js
-'alg=bitpad-v1&v=1&d=' + base64urlString
+```
+1ag/<base64url>
 ```
 
 This is the value placed after `#` in the share URL.
@@ -82,22 +87,21 @@ This is the value placed after `#` in the share URL.
 
 Given a hash fragment string:
 
-1. Split on `&` to extract `alg`, `v`, and `d` parameters
-2. Verify `alg === 'bitpad-v1'` — reject if unknown
-3. Reverse base64url: add `=` padding, replace `-`->`+`, `_`->`/`, then decode from base64 to bytes
-4. Decompress using `inflateRaw` (raw DEFLATE inflate)
+1. Check `/^[0-9][a-z][a-z]\//.test(hash)` — reject if not matched
+2. Extract payload: `hash.slice(4)` (skip the 3-char tag and `/`)
+3. Reverse base64url: add `=` padding, replace `-`→`+`, `_`→`/`, then base64-decode to bytes
+4. Decompress: `fflate.inflateSync(bytes)`
 5. Parse the binary frame (see below) to reconstruct the record object
 
 ---
 
-## bitpad-v1 Binary Frame Format
+## pads-v1 Binary Frame Format
 
 ### Frame Header (3 bytes)
 
 ```
-Byte 0:   Template identifier
-Byte 1:   Presence flags — bits 0-7  (fields 0-7)
-Byte 2:   Presence flags — bits 8-11 (fields 8-11), upper bits reserved 0
+Byte 0:    Template identifier (uint8)
+Bytes 1–2: Presence flags (uint16, big-endian)
 ```
 
 **Template identifiers:**
@@ -105,47 +109,82 @@ Byte 2:   Presence flags — bits 8-11 (fields 8-11), upper bits reserved 0
 | Byte | Template |
 |------|----------|
 | `0x01` | `svc-basic` v1 |
-| `0x02`-`0xFF` | Reserved for future templates |
+| `0x02`–`0xFF` | Reserved for future templates |
 
-**Presence flags** encode which fields are present in the frame. One bit per field slot, in the fixed field order below. A bit is `1` if the field has a value and its blob is included; `0` if the field is absent and no blob follows.
+### Presence Flags — 16-bit Big-Endian Uint16
 
-### Field Slot Order (svc-basic, bitpad-v1)
+The presence flags occupy **bytes 1 and 2** as a single 16-bit big-endian unsigned integer.
 
-| Bit | Field key | Flag byte |
-|-----|-----------|-----------|
-| 0 | `job` | byte 1, bit 0 (LSB) |
-| 1 | `customer` | byte 1, bit 1 |
-| 2 | `date` | byte 1, bit 2 |
-| 3 | `location` | byte 1, bit 3 |
-| 4 | `start_time` | byte 1, bit 4 |
-| 5 | `end_time` | byte 1, bit 5 |
-| 6 | `meeting_time` | byte 1, bit 6 |
-| 7 | `customer_phone` | byte 1, bit 7 (MSB) |
-| 8 | `worker` | byte 2, bit 0 (LSB) |
-| 9 | `details` | byte 2, bit 1 |
-| 10 | `story` | byte 2, bit 2 |
-| 11 | `actions` | byte 2, bit 3 |
+```js
+flags = (frame[1] << 8) | frame[2]
+```
 
-Bits 4-7 of byte 2 are reserved and must be `0` in v1 frames.
+**Big-endian: byte 1 is the high byte (bits 8–15), byte 2 is the low byte (bits 0–7).**
+
+> ⚠️ **Critical implementation note:** Do not read the flags as little-endian (`frame[1] | (frame[2] << 8)`). This byte-swap silently produces wrong flag values — fields decode as the wrong type, byte offsets cascade incorrectly, and the record appears corrupt or partially empty. Always read as `(frame[1] << 8) | frame[2]`.
+
+A bit is `1` if the corresponding field has a value and its blob is included in the frame. A bit is `0` if the field is absent and no blob follows.
+
+### Field Slot Assignments (svc-basic, pads-v1)
+
+| Bit | Flag mask | Field key | Type |
+|-----|-----------|-----------|------|
+| 0 | `0x0001` | `job` | scalar |
+| 1 | `0x0002` | `customer` | scalar |
+| 2 | `0x0004` | `date` | scalar |
+| 3 | `0x0008` | `location` | scalar |
+| 4 | `0x0010` | `meeting_time` | scalar |
+| 5 | `0x0020` | `start_time` | scalar |
+| 6 | `0x0040` | `end_time` | scalar |
+| 7 | `0x0080` | `customer_phone` | scalar |
+| 8 | `0x0100` | `worker` | scalar |
+| 9 | `0x0200` | `actions` | actions blob |
+| 10 | `0x0400` | `details` | scalar |
+| 11 | `0x0800` | `story` | scalar |
+| 12 | `0x1000` | `amount` | scalar (decimal string) |
+| 13 | `0x2000` | `currency` | scalar (ISO 4217 code: `GBP`, `EUR`, `USD`) |
+| 14 | `0x4000` | `vat` | scalar (`none`, `standard`, `zero`, `reduced`) |
+| 15 | `0x8000` | `record_type` | scalar (`job`, `quote`, `invoice`, `ack`) |
+
+Bits 0–8 map to scalar fields appearing before the actions blob. Bits 10–15 map to scalar fields appearing after the actions blob. Bit 9 signals the actions blob between the two scalar groups.
+
+**Chain reference:** Financial and relational context is carried by an optional chain reference appended to the URL:
+
+```
+1ag/<base64url>&c=<chainRef>
+```
+
+The chain reference is 4 base64url characters (3 random bytes). It links related records (e.g., a quote and its approval). Strip `&c=<chainRef>` before passing the payload to the frame decoder. Store `chainRef` on decoded records for chain lookups.
+
+### Frame Body Layout
+
+Fields appear in bit-order (lowest bit first), split into two groups around the actions blob:
+
+```
+[low scalars: bits 0–8, in ascending bit order]
+[actions blob, if bit 9 set]
+[high scalars: bits 10–15, in ascending bit order]
+```
 
 ### Scalar Field Blobs
 
-For each field with its presence bit set (in slot order, low to high):
+For each scalar field with its bit set:
 
 ```
 [length_high_byte][length_low_byte][utf8_bytes...]
 ```
 
-Length is a 2-byte big-endian unsigned integer representing the byte count of the UTF-8 encoded field value. Maximum field length: 65,535 bytes.
+Length is a **2-byte big-endian uint16** giving the byte count of the UTF-8 encoded value. Maximum: 65,535 bytes.
 
-**Example:** Field value `"Replace faucet"` (14 bytes UTF-8):
+**Example:** `"Replace faucet"` (14 bytes):
+
 ```
-0x00 0x0E 52 65 70 6C 61 63 65 20 66 61 75 63 65 74
+0x00 0x0E  52 65 70 6C 61 63 65 20 66 61 75 63 65 74
 ```
 
 ### Actions Blob
 
-When bit 11 is set, the actions sequence immediately follows all scalar blobs:
+When bit 9 is set, the actions sequence follows all low scalar blobs:
 
 ```
 [action_count_byte]
@@ -154,15 +193,16 @@ When bit 11 is set, the actions sequence immediately follows all scalar blobs:
   ... (repeated for each action)
 ```
 
-- `action_count_byte`: number of actions (0-255)
-- For each action: one title blob then one notes blob, both 2-byte length-prefixed
-- `notes` may have length 0 (zero bytes follow the length prefix)
+- `action_count_byte`: number of actions, 0–20 (uint8)
+- Each action: title blob then notes blob, both 2-byte big-endian length-prefixed
+- `notes` may have length 0; the `0x00 0x00` length prefix is still present
 
 ---
 
 ## Worked Example
 
 Record:
+
 ```json
 {
   "job": "Fix tap",
@@ -171,52 +211,59 @@ Record:
 }
 ```
 
-**Step 1 — Presence flags:**
-- bit 0 (`job`): 1
-- bit 1 (`customer`): 1
-- bit 11 (`actions`): 1
+**Presence flags:**
 
-Flag byte 1: `0b00000011` = `0x03`
-Flag byte 2: `0b00001000` = `0x08`
+- bit 0 (`job`): `0x0001`
+- bit 1 (`customer`): `0x0002`
+- bit 9 (`actions`): `0x0200`
+
+`flags = 0x0203`  → byte 1 = `0x02`, byte 2 = `0x03`
 
 **Frame bytes (before compression):**
+
 ```
-0x01                 template = svc-basic
-0x03                 flag byte 1: job + customer present
-0x08                 flag byte 2: actions present
-0x00 0x07            job length = 7
-46 69 78 20 74 61 70  "Fix tap"
-0x00 0x05            customer length = 5
-41 6C 69 63 65        "Alice"
-0x01                 action count = 1
-0x00 0x06            title length = 6
-41 72 72 69 76 65    "Arrive"
-0x00 0x00            notes length = 0  (empty)
+0x01              template = svc-basic
+0x02 0x03         flags big-endian: 0x0203
+0x00 0x07         job length = 7
+46 69 78 20 74 61 70   "Fix tap"
+0x00 0x05         customer length = 5
+41 6C 69 63 65    "Alice"
+0x01              action count = 1
+0x00 0x06         title length = 6
+41 72 72 69 76 65 "Arrive"
+0x00 0x00         notes length = 0
 ```
 
-**Step 2 — Compress** with deflateRaw → shorter byte sequence.
+Compressed with `deflateSync` → base64url → prepend `1ag/` → append to `https://workpads.me/p#`.
 
-**Step 3 — base64url** → compact ASCII string.
+---
 
-**Step 4 — Hash fragment:**
-```
-alg=bitpad-v1&v=1&d=<compressed-base64url>
-```
+## Byte Order Summary
+
+All multi-byte integers in the pads-v1 frame are **big-endian** (most significant byte first):
+
+| Field | Size | Encoding |
+|-------|------|----------|
+| Presence flags | 2 bytes | big-endian uint16 |
+| Scalar field length | 2 bytes | big-endian uint16 |
+| Action title length | 2 bytes | big-endian uint16 |
+| Action notes length | 2 bytes | big-endian uint16 |
+
+Correct flag read: `flags = (frame[1] << 8) | frame[2]`
+Incorrect (little-endian): `flags = frame[1] | (frame[2] << 8)` — **do not use**
 
 ---
 
 ## Size Characteristics
 
-Typical encoded sizes for a `svc-basic` record:
-
 | Record content | Approx. hash fragment length |
 |----------------|------------------------------|
 | Job only | ~60 chars |
 | Job + customer + date + location | ~100 chars |
-| Full record (all fields, 2 actions) | ~180-220 chars |
-| Full record (all fields, 5 actions) | ~260-300 chars |
+| Full record (all fields, 2 actions) | ~180–220 chars |
+| Full record (all fields, 5 actions) | ~260–300 chars |
 
-These lengths are well within SMS message limits and QR code capacity.
+Well within SMS message limits and QR code capacity.
 
 ---
 
@@ -224,24 +271,32 @@ These lengths are well within SMS message limits and QR code capacity.
 
 | Implementation | Location | Environment |
 |----------------|----------|-------------|
-| Browser codec | `workpadskaios/js/lib/codec.js` — `window.WPCodec` | Browser (fflate UMD) |
-| Node.js package | `workpads-codec/src/` — `@workpads/codec` | Node.js >= 14 |
+| Browser codec | `workpadsdotme/js/lib/codec.js` — `window.WPCodec` | Browser (fflate UMD) |
+| Standalone decoder | `workpadsdotme/p/customer.html` — inline | Browser, no dependencies |
 
-Both implementations produce identical output. A URL encoded by the browser codec can be decoded by the Node.js package and vice versa.
+Both produce identical output. A URL encoded by any implementation can be decoded by any other.
 
 ---
 
-## Comparison with v0.x JSON Encoding (workpads-cli legacy)
+## Codec Identity
 
-The original workpads-cli (pre-bitpad-v1) used a different encoding:
+This codec is registered in the bitpads registry as:
 
-| Property | Legacy JSON encoding | bitpad-v1 |
-|----------|---------------------|-----------|
-| Payload format | JSON object with compact keys | Binary frame |
-| Compression | zlib deflateRaw (same algorithm) | fflate deflateRaw |
-| Field keys | Short aliases (`j`, `c`, `d`, ...) | No keys — positional presence flags |
-| URL path | `/new#` | `/p#` |
-| Detection | No `alg=` param | `alg=bitpad-v1` |
-| Typical size | ~15-20% larger | baseline |
+```
+iHX7-3F9KQ2
+```
 
-Legacy URLs (`/new#...`) and bitpad-v1 URLs (`/p#alg=bitpad-v1&...`) are not cross-compatible. Clients should detect by `alg=` param presence and path.
+Use this identifier when referencing the codec externally (documentation, interoperability notes, registry queries). The identifier refers to the complete encoding scheme: pads-v1 binary frame + DEFLATE + base64url + `1ag/` scheme tag.
+
+**Do not use** `bitpad-v1` as an external identifier — that name belongs to the earlier legacy format (`alg=bitpad-v1&d=...`). The current format with scheme tag `1ag/` is a distinct encoding registered separately.
+
+---
+
+## URL Format History
+
+| Era | Hash format | Detection |
+|-----|-------------|-----------|
+| Legacy (pre-v1) | `alg=bitpad-v1&v=1&d=<base64url>` | `alg=bitpad-v1` substring |
+| Current (pads-v1) | `1ag/<base64url>` | `/^[0-9][a-z][a-z]\//` regex |
+
+Legacy and current formats are not cross-compatible. Decoders should detect by regex and handle or reject accordingly.

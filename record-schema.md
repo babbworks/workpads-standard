@@ -3,7 +3,7 @@
 **Status:** v1 (settled 2026-04-27)
 **Template:** `svc-basic`
 **Template version:** `v1`
-**Codec:** bitpad-v1
+**Codec:** pads-v1
 
 ---
 
@@ -30,7 +30,7 @@ This section defines the complete field schema for the `svc-basic` template, ver
 | 11 | Story | `story` | string | Story | No | bit 10 |
 | 12 | Actions | `actions` | array | Actions | No | bit 11 |
 
-Codec slot numbers correspond directly to bit positions in the 2-byte presence flags of the bitpad-v1 frame (see §5).
+Codec slot numbers correspond directly to bit positions in the 2-byte presence flags of the pads-v1 frame (see §5).
 
 ---
 
@@ -43,7 +43,7 @@ The compiled runtime schema for `svc-basic v1` is:
   "id": "svc-basic",
   "version": "v1",
   "label": "Field Service — Basic",
-  "codec": "bitpad-v1",
+  "codec": "pads-v1",
   "variants": ["plain"],
   "fields": [
     { "key": "job",            "label": "Job",            "type": "string", "required": true,  "section": "process" },
@@ -135,7 +135,7 @@ The `.kv` format is the canonical source of truth. The `.yaml` file is a compila
 
 New templates must:
 
-1. Define a unique template identifier byte (the first byte of the bitpad-v1 frame)
+1. Define a unique template identifier byte (the first byte of the pads-v1 frame)
 2. Define a fixed, stable field order for the presence flags
 3. Register a compiled runtime schema in the template registry
 4. Be documented in this standard before use
